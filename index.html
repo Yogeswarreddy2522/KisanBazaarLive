@@ -1,19 +1,731 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>My static Space</title>
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<div class="card">
-			<h1>Welcome to your static Space!</h1>
-			<p>You can modify this app directly by editing <i>index.html</i> in the Files and versions tab.</p>
-			<p>
-				Also don't forget to check the
-				<a href="https://huggingface.co/docs/hub/spaces" target="_blank">Spaces documentation</a>.
-			</p>
-		</div>
-	</body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KisanBazaarLive - Agricultural Commodity Prices & Market Updates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .price-up {
+            color: #10b981;
+        }
+        .price-down {
+            color: #ef4444;
+        }
+        .price-neutral {
+            color: #6b7280;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        }
+        .commodity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .language-selector:hover .language-dropdown {
+            display: block;
+        }
+        .chart-container {
+            height: 300px;
+        }
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: none;
+            }
+            .mobile-menu.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Header -->
+    <header class="bg-green-800 text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-tractor text-2xl"></i>
+                <h1 class="text-2xl font-bold">KisanBazaarLive</h1>
+            </div>
+            
+            <div class="hidden md:flex space-x-6">
+                <a href="#prices" class="hover:text-green-200">Market Prices</a>
+                <a href="#trends" class="hover:text-green-200">Price Trends</a>
+                <a href="#news" class="hover:text-green-200">News & Alerts</a>
+                <a href="#about" class="hover:text-green-200">About Us</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative language-selector">
+                    <button class="flex items-center space-x-1">
+                        <i class="fas fa-globe"></i>
+                        <span>English</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="language-dropdown hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-green-100">हिंदी</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-green-100">తెలుగు</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-green-100">मराठी</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-green-100">বাংলা</a>
+                    </div>
+                </div>
+                
+                <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md hidden md:block">
+                    <i class="fas fa-user mr-2"></i>Login/Signup
+                </button>
+                
+                <button id="mobile-menu-button" class="md:hidden text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden flex-col bg-green-900 px-4 py-2 space-y-2">
+            <a href="#prices" class="block py-2 hover:bg-green-800 px-2 rounded">Market Prices</a>
+            <a href="#trends" class="block py-2 hover:bg-green-800 px-2 rounded">Price Trends</a>
+            <a href="#news" class="block py-2 hover:bg-green-800 px-2 rounded">News & Alerts</a>
+            <a href="#about" class="block py-2 hover:bg-green-800 px-2 rounded">About Us</a>
+            <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md w-full text-left">
+                <i class="fas fa-user mr-2"></i>Login/Signup
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Real-time Agricultural Commodity Prices</h2>
+                    <p class="text-lg text-gray-600 mb-6">Get live mandi prices, market trends, and government policies for grains, vegetables, fruits, and spices across India.</p>
+                    
+                    <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                        <div class="relative flex-grow">
+                            <input type="text" placeholder="Search commodity..." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button class="absolute right-2 top-2 text-gray-500 hover:text-green-700">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-bell mr-2"></i>Price Alerts
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Farmers in field" class="rounded-lg shadow-xl max-w-full h-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Market Prices Section -->
+    <section id="prices" class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Today's Market Prices</h2>
+            
+            <!-- Filters -->
+            <div class="bg-gray-100 p-4 rounded-lg mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            <option>All States</option>
+                            <option>Andhra Pradesh</option>
+                            <option>Maharashtra</option>
+                            <option>Punjab</option>
+                            <option>Uttar Pradesh</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">District</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            <option>All Districts</option>
+                            <option>Palnadu</option>
+                            <option>Guntur</option>
+                            <option>Prakasam</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mandi</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            <option>All Mandis</option>
+                            <option>Narasingapadu</option>
+                            <option>Guntur Main</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Commodity Type</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            <option>All Types</option>
+                            <option>Grains</option>
+                            <option>Vegetables</option>
+                            <option>Fruits</option>
+                            <option>Spices</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Price Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                    <thead class="bg-green-700 text-white">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Commodity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Variety</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Mandi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Price (₹/Quintal)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Change</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Last Updated</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-wheat text-green-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Rice</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Sona Masoori</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Narasingapadu</div>
+                                <div class="text-sm text-gray-500">Palnadu, AP</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ₹2,450
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="price-up"><i class="fas fa-arrow-up mr-1"></i> ₹50 (2.1%)</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Today, 10:45 AM
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-green-600 hover:text-green-900 mr-3"><i class="fas fa-chart-line"></i></button>
+                                <button class="text-blue-600 hover:text-blue-900"><i class="fas fa-bell"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-pepper-hot text-red-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Chili</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Teja</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Guntur Main</div>
+                                <div class="text-sm text-gray-500">Guntur, AP</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ₹15,800
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="price-down"><i class="fas fa-arrow-down mr-1"></i> ₹320 (2.0%)</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Today, 11:30 AM
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-green-600 hover:text-green-900 mr-3"><i class="fas fa-chart-line"></i></button>
+                                <button class="text-blue-600 hover:text-blue-900"><i class="fas fa-bell"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-seedling text-yellow-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Groundnut</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">TMV-2</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Narasingapadu</div>
+                                <div class="text-sm text-gray-500">Palnadu, AP</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ₹5,750
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="price-neutral"><i class="fas fa-minus mr-1"></i> ₹0 (0.0%)</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Today, 9:15 AM
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-green-600 hover:text-green-900 mr-3"><i class="fas fa-chart-line"></i></button>
+                                <button class="text-blue-600 hover:text-blue-900"><i class="fas fa-bell"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-apple-alt text-red-500"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Tomato</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Hybrid</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Prakasam</div>
+                                <div class="text-sm text-gray-500">Prakasam, AP</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ₹1,200
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="price-up"><i class="fas fa-arrow-up mr-1"></i> ₹150 (14.3%)</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Today, 12:45 PM
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-green-600 hover:text-green-900 mr-3"><i class="fas fa-chart-line"></i></button>
+                                <button class="text-blue-600 hover:text-blue-900"><i class="fas fa-bell"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 flex justify-center">
+                <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+                    View All Commodities
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Price Trends Section -->
+    <section id="trends" class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Price Trends & Analysis</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Rice (Sona Masoori) - Weekly Trend</h3>
+                        <select class="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>Last 6 Months</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <!-- This would be replaced with an actual chart in production -->
+                        <div class="bg-gray-100 h-full flex items-center justify-center rounded">
+                            <p class="text-gray-500">Price chart would be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Chili (Teja) - Monthly Comparison</h3>
+                        <select class="px-3 py-1 border border-gray-300 rounded-md text-sm">
+                            <option>Current Month</option>
+                            <option>Last Month</option>
+                            <option>Yearly</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <!-- This would be replaced with an actual chart in production -->
+                        <div class="bg-gray-100 h-full flex items-center justify-center rounded">
+                            <p class="text-gray-500">Comparison chart would be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Commodity Price Predictions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="commodity-card bg-white border border-gray-200 rounded-lg p-4 transition-all duration-300 hover:shadow-lg">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-medium text-lg">Rice</h4>
+                                <p class="text-sm text-gray-500">Sona Masoori</p>
+                            </div>
+                            <div class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Stable</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-500">Current Price</p>
+                                <p class="font-medium">₹2,450/Q</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500">Next Week</p>
+                                <p class="font-medium">₹2,480-2,520/Q</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="commodity-card bg-white border border-gray-200 rounded-lg p-4 transition-all duration-300 hover:shadow-lg">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-medium text-lg">Chili</h4>
+                                <p class="text-sm text-gray-500">Teja</p>
+                            </div>
+                            <div class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Declining</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-500">Current Price</p>
+                                <p class="font-medium">₹15,800/Q</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500">Next Week</p>
+                                <p class="font-medium">₹15,200-15,500/Q</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="commodity-card bg-white border border-gray-200 rounded-lg p-4 transition-all duration-300 hover:shadow-lg">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-medium text-lg">Tomato</h4>
+                                <p class="text-sm text-gray-500">Hybrid</p>
+                            </div>
+                            <div class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Volatile</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-500">Current Price</p>
+                                <p class="font-medium">₹1,200/Q</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500">Next Week</p>
+                                <p class="font-medium">₹1,000-1,400/Q</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News & Updates Section -->
+    <section id="news" class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">News & Government Updates</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div class="h-48 bg-green-700 flex items-center justify-center text-white">
+                        <i class="fas fa-newspaper text-5xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>July 15, 2023</span>
+                            <span class="mx-2">•</span>
+                            <span>Government Policy</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">New MSP announced for Kharif crops</h3>
+                        <p class="text-gray-600 mb-4">The government has announced Minimum Support Prices for Kharif crops for the 2023-24 season with increases ranging from 5-7% across commodities.</p>
+                        <a href="#" class="text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                    </div>
+                </div>
+                
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div class="h-48 bg-blue-700 flex items-center justify-center text-white">
+                        <i class="fas fa-cloud-sun-rain text-5xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>July 12, 2023</span>
+                            <span class="mx-2">•</span>
+                            <span>Weather Alert</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Heavy rains expected in Andhra Pradesh</h3>
+                        <p class="text-gray-600 mb-4">IMD predicts heavy to very heavy rainfall in coastal Andhra Pradesh over the next 3 days which may affect harvest and transportation of crops.</p>
+                        <a href="#" class="text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                    </div>
+                </div>
+                
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div class="h-48 bg-yellow-600 flex items-center justify-center text-white">
+                        <i class="fas fa-rupee-sign text-5xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>July 10, 2023</span>
+                            <span class="mx-2">•</span>
+                            <span>Market Update</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Chili prices drop as new supply enters market</h3>
+                        <p class="text-gray-600 mb-4">With the new harvest season beginning, chili prices have dropped by 8-10% in major Andhra markets. Experts predict further decline in coming weeks.</p>
+                        <a href="#" class="text-green-600 hover:text-green-800 font-medium">Read More →</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+                    View All News Updates
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subscription Section -->
+    <section class="py-12 bg-green-700 text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">Get Price Alerts Directly</h2>
+                <p class="text-lg mb-8">Subscribe to receive SMS/Email notifications when prices change for your selected commodities.</p>
+                
+                <div class="bg-white rounded-lg p-6 shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 text-left">Commodity</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800">
+                                <option>Select Commodity</option>
+                                <option>Rice</option>
+                                <option>Chili</option>
+                                <option>Groundnut</option>
+                                <option>Tomato</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 text-left">Mandi</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800">
+                                <option>Select Mandi</option>
+                                <option>Narasingapadu</option>
+                                <option>Guntur Main</option>
+                                <option>Prakasam</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 text-left">Phone/Email</label>
+                            <input type="text" placeholder="Enter phone or email" class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md w-full md:w-auto">
+                            Subscribe for Alerts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h2 class="text-3xl font-bold mb-4">About KisanBazaarLive</h2>
+                    <p class="text-gray-600 mb-4">KisanBazaarLive is a comprehensive agricultural commodity price tracking platform that provides real-time market prices, trends, and government policy updates to farmers, traders, and stakeholders across India.</p>
+                    <p class="text-gray-600 mb-6">Our mission is to empower farmers with accurate, timely market information to help them get fair prices for their produce and make informed selling decisions.</p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span>Real-time Prices</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span>Multi-language Support</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span>Price Alerts</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span>Market Analysis</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-12">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Contact Us</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-map-marker-alt text-green-600 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-medium">Address</h4>
+                                    <p class="text-gray-600">1-14, Narasingapadu, Palnadu, Andhra Pradesh, 522615</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <i class="fas fa-phone-alt text-green-600 mr-3"></i>
+                                <div>
+                                    <h4 class="font-medium">Phone</h4>
+                                    <p class="text-gray-600">+91 7569251031</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-green-600 mr-3"></i>
+                                <div>
+                                    <h4 class="font-medium">Email</h4>
+                                    <p class="text-gray-600">kvnrpyr@gmail.com</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-medium mb-2">Follow Us</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="text-gray-600 hover:text-green-600"><i class="fab fa-facebook-f text-xl"></i></a>
+                                <a href="#" class="text-gray-600 hover:text-green-600"><i class="fab fa-twitter text-xl"></i></a>
+                                <a href="#" class="text-gray-600 hover:text-green-600"><i class="fab fa-instagram text-xl"></i></a>
+                                <a href="#" class="text-gray-600 hover:text-green-600"><i class="fab fa-youtube text-xl"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-tractor mr-2"></i> KisanBazaarLive
+                    </h3>
+                    <p class="text-gray-400">Empowering farmers with real-time market information and price transparency.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#prices" class="text-gray-400 hover:text-white">Market Prices</a></li>
+                        <li><a href="#trends" class="text-gray-400 hover:text-white">Price Trends</a></li>
+                        <li><a href="#news" class="text-gray-400 hover:text-white">News & Updates</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Commodities</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Grains</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Vegetables</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Fruits</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Spices</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe to get weekly market updates.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-3 py-2 bg-gray-700 text-white rounded-l-md focus:outline-none w-full">
+                        <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-r-md">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2023 KisanBazaarLive. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">FAQ</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
+        });
+
+        // Simulate price changes for demo purposes
+        function simulatePriceChanges() {
+            const priceElements = document.querySelectorAll('.price-up, .price-down, .price-neutral');
+            
+            priceElements.forEach(el => {
+                // Randomly decide if we should change this price
+                if (Math.random() > 0.7) {
+                    const isUp = Math.random() > 0.5;
+                    const changeAmount = Math.floor(Math.random() * 100) + 1;
+                    const currentPrice = parseFloat(el.closest('tr').querySelector('td:nth-child(4)').textContent.replace('₹', '').replace(',', ''));
+                    
+                    if (isUp) {
+                        el.className = 'price-up';
+                        el.innerHTML = `<i class="fas fa-arrow-up mr-1"></i> ₹${changeAmount} (${(changeAmount/currentPrice*100).toFixed(1)}%)`;
+                        el.closest('tr').querySelector('td:nth-child(4)').textContent = `₹${(currentPrice + changeAmount).toLocaleString()}`;
+                    } else {
+                        el.className = 'price-down';
+                        el.innerHTML = `<i class="fas fa-arrow-down mr-1"></i> ₹${changeAmount} (${(changeAmount/currentPrice*100).toFixed(1)}%)`;
+                        el.closest('tr').querySelector('td:nth-child(4)').textContent = `₹${(currentPrice - changeAmount).toLocaleString()}`;
+                    }
+                    
+                    // Update timestamp
+                    const now = new Date();
+                    el.closest('tr').querySelector('td:nth-child(6)').textContent = `Today, ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+                }
+            });
+        }
+
+        // Run price changes every 30 seconds for demo
+        setInterval(simulatePriceChanges, 30000);
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu.classList.contains('active')) {
+                        mobileMenu.classList.remove('active');
+                    }
+                }
+            });
+        });
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=Yogeswarreddy/kisanbazaarlive" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
 </html>
